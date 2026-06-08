@@ -29,9 +29,10 @@ def resource_path(relative_path):
     return os.path.join(os.path.abspath("."), relative_path)
 
 
-def install_package(package_name):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
-
+def install_package(*args):
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", *args]
+    )
 
 def is_termux():
     termux_prefix = os.environ.get("PREFIX")
@@ -43,3 +44,14 @@ def is_termux():
         return True
     else:
         return os.path.isdir("/data/data/com.termux")
+    
+def install_termux_package(package_name, display_name=None):
+    display_name = display_name or package_name
+
+    print(f"\033[1;36m[0]Attempting to install {display_name}\033[m")
+
+    try:
+        subprocess.check_call(["pkg", "install", package_name, "-y"])
+        print(f"\033[1;36m[0]Installed {display_name} successfully!\033[m")
+    except Exception as e:
+        print(f"\033[1;31m[x]Error installing {display_name}:\n{e}\033[m")

@@ -15,8 +15,15 @@ import sys
 import subprocess
 import tomllib
 
+from utils.system import (
+    clear,
+    is_termux,
+    install_package,
+    install_termux_package,
+)
+
 try:
-    os.system("cls") if os.name == "nt" else os.system("clear")
+    clear()
 except Exception:
     pass
 print(
@@ -30,19 +37,6 @@ def load_json_dict(file_path="config/captcha.toml"):
 
 
 cap_cnf_dict = load_json_dict()
-
-
-def is_termux():
-    termux_prefix = os.environ.get("PREFIX")
-    termux_home = os.environ.get("HOME")
-
-    if termux_prefix and "com.termux" in termux_prefix:
-        return True
-    elif termux_home and "com.termux" in termux_home:
-        return True
-    else:
-        return os.path.isdir("/data/data/com.termux")
-
 
 """while True:
     user_input = input("[?]Do you want help setting this up from scratch? (Y/N):-\n").lower()
@@ -60,9 +54,7 @@ if scratchSetup:
     print("\033[1;36m[0]attempting to install requirements.txt\033[m")
     try:
         try:
-            subprocess.check_call(
-                [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]
-            )
+            install_package("-r", "requirements.txt")
         except Exception:
             if is_termux():
                 print(
@@ -70,9 +62,7 @@ if scratchSetup:
                 )
                 subprocess.check_call(["pkg", "update", "-y"])
                 subprocess.check_call(["pkg", "upgrade", "-y"])
-                subprocess.check_call(
-                    [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]
-                )
+                install_package("-r", "requirements.txt")
         print(
             "\033[1;36m[0]Installed modules from requirements.txt successfully!\033[m"
         )
@@ -88,31 +78,12 @@ if scratchSetup:
             # print("please type and enter \"Y\" for all such!")
             print()
 
-            """Numpy Installation"""
-            print("\033[1;36m[0]Attepmting to install numpy\033[m")
-            try:
-                subprocess.check_call(["pkg", "install", "python-numpy", "-y"])
-                print("\033[1;36m[0]installed numpy successfully!\033[m")
-            except Exception as e:
-                print(f"\033[1;31m[x]error when trying to install numpy:-\n {e}\033[m")
+            """Numpy, PIL and termux-api Installation"""
+            install_termux_package("python-numpy", "numpy")
+            install_termux_package("python-pillow", "PIL")
+            install_termux_package("termux-api")
 
-            """PILL Installation"""
-            print("\033[1;36m[0]Attepmting to install PIL\033[m")
-            try:
-                subprocess.check_call(["pkg", "install", "python-pillow", "-y"])
-                print("\033[1;36m[0]installed PIL successfully!\033[m")
-            except Exception as e:
-                print(f"\033[1;31m[x]error when trying to install PIL:-\n {e}\033[m")
 
-            """Termux-api Installation"""
-            print("\033[1;36m[0]Attepmting to install termux-api...\033[m")
-            try:
-                subprocess.check_call(["pkg", "install", "termux-api", "-y"])
-                print("\033[1;36m[0]installed termux-api successfully!\033[m")
-            except Exception as e:
-                print(
-                    f"\033[1;31m[x]error when trying to install termux-api:-\n {e}\033[m"
-                )
             if cap_cnf_dict["image_solver"]["enabled"]:
                 print("\033[1;36m[0]Attepmting to install onnxruntime...\033[m")
                 try:

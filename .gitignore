@@ -120,3 +120,7 @@ Desktop.ini
 
 # Tokens file
 **/tokens.txt
+
+# EVEN MORE DB FILES
+*.sqlite-wal
+*.sqlite-shm
