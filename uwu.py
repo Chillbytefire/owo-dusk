@@ -14,11 +14,13 @@
 import os
 import signal
 import threading
+import glob
 
 # Third-Party Libraries
 import discord
 from discord import SyncWebhook
 from queue import Queue
+import asyncio
 
 # Local
 import utils.state as state
@@ -26,6 +28,7 @@ from utils.notification import notify
 from utils.webhook import webhookSender
 from utils.runtime_handler import start_runtime_loop
 from utils.captcha_solver.yescaptcha import captchaClient
+from utils.config_watcher import start_config_watcher
 from utils.bot_runner import fetch_json, run_bots
 from utils.database import create_database
 from website import web_start
@@ -99,6 +102,17 @@ if __name__ == "__main__":
 
     # Create database or modify if required
     create_database()
+
+    CONFIG_PATHS = glob.glob(os.path.join("config", "*.settings.json")) + [os.path.join("config", "settings.json")]
+    CONFIG_PATHS = list(set(CONFIG_PATHS))
+    
+    def reload_configs():
+       for bot in getattr(state, "clients", []):
+           if bot.is_ready():
+               asyncio.run_coroutine_threadsafe(bot.update_config(), bot.loop)
+    
+    print("About to start watcher")
+    start_config_watcher(CONFIG_PATHS, reload_configs, interval=2)
 
     # Weekly runtime thread
     start_runtime_loop()

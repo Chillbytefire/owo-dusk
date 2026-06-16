@@ -16,11 +16,15 @@ def fetch_json(url, description="data"):
 
 def run_bot(token, channel_id, global_settings_dict, token_len):
     from client import MyClient
+    import utils.state as state
     try:
         logging.getLogger("discord.client").setLevel(logging.ERROR)
 
         while True:
             client = MyClient(token, channel_id, global_settings_dict, token_len)
+            if not hasattr(state, "clients"):
+                state.clients = []
+            state.clients.append(client)
 
             try:
                 client.run(token, log_level=logging.ERROR)

@@ -4,8 +4,10 @@ import threading
 
 def watch_configs(paths, on_change, interval=2):
     last_state = {}
-
+    
+    print("Watching paths:", paths)
     for p in paths:
+        print(p, "exists:", os.path.exists(p))
         try:
             last_state[p] = os.path.getmtime(p)
         except FileNotFoundError:
@@ -33,6 +35,7 @@ def watch_configs(paths, on_change, interval=2):
             if now - last_trigger > 1.5:
                 last_trigger = now
                 try:
+                    print("CONFIG CHANGE DETECTED BY CONFIG WATCHER.")
                     on_change()
                 except Exception as e:
                     print(f"[ConfigWatcher] callback error: {e}")
