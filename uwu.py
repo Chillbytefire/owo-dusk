@@ -111,7 +111,7 @@ if __name__ == "__main__":
            if bot.is_ready():
                asyncio.run_coroutine_threadsafe(bot.update_config(), bot.loop)
     
-    print("About to start watcher")
+   
     start_config_watcher(CONFIG_PATHS, reload_configs, interval=2)
 
     # Weekly runtime thread
